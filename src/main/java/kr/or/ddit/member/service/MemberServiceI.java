@@ -19,4 +19,6 @@ public interface MemberServiceI {
 	int deleteMember(String userid);
 	
 	int updateMember(MemberVo memberVo);
+	
+	List<MemberVo> searchMember(Map<String, Object> map);
 }

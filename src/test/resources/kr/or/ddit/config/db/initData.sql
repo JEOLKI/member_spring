@@ -20,6 +20,5 @@ Insert into USERS (USERID,USERNM,PASS,REG_DT,ALIAS,ADDR1,ADDR2,ZIPCODE,FILENAME,
 Insert into USERS (USERID,USERNM,PASS,REG_DT,ALIAS,ADDR1,ADDR2,ZIPCODE,FILENAME,REALFILENAME) values ('con','콘','conPass',to_date('2020-10-15','YYYY-MM-DD'),'악어',null,null,null,null,null);
 Insert into USERS (USERID,USERNM,PASS,REG_DT,ALIAS,ADDR1,ADDR2,ZIPCODE,FILENAME,REALFILENAME) values ('apeach','어피치','apeachPass',to_date('2020-10-15','YYYY-MM-DD'),'복숭아',null,null,null,null,null);
 Insert into USERS (USERID,USERNM,PASS,REG_DT,ALIAS,ADDR1,ADDR2,ZIPCODE,FILENAME,REALFILENAME) values ('ryan','라이언 ','ryanPass',to_date('2020-10-15','YYYY-MM-DD'),'사자',null,null,null,'D:\profile\ryan.png','ryan.png');
-Insert into USERS (USERID,USERNM,PASS,REG_DT,ALIAS,ADDR1,ADDR2,ZIPCODE,FILENAME,REALFILENAME) values ('test','updatetest','test',to_date('2020-11-05','YYYY-MM-DD'),'test','test','test','test','D:\profile\922d92da-4d73-47b1-a6c4-4e3c0dd10465.png','brown.png');
 
 COMMIT;

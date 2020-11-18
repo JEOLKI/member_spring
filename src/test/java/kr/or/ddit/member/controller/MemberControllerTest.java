@@ -26,30 +26,41 @@ public class MemberControllerTest extends WebTestConfig{
 	private MemberRepositoryI memberRepository;
 	
 	@Test
-	public void getViewTest() throws Exception {
-		mockMvc.perform(get("/member/list"))
+	public void listTest() throws Exception {
+		mockMvc.perform(get("/member/list")
+						.param("page", "1")
+						.param("pageSize", "5"))
 				.andExpect(status().isOk())
-				.andExpect(view().name("tiles/member/memberListContent"));
+				.andExpect(model().attributeExists("memberList"))
+				.andExpect(model().attributeExists("pages"))
+				.andExpect(view().name("jsonView"));
 	}
 	
 	@Test
-	public void getMemberTest() throws Exception {
-		mockMvc.perform(get("/member/member")
+	public void getMember_GET_Test() throws Exception {
+		mockMvc.perform(get("/member/member"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("member/member"));
+	}
+	
+	@Test
+	public void getMember_POST_Test() throws Exception {
+		mockMvc.perform(post("/member/member")
 						.param("userid", "brown"))
 				.andExpect(status().isOk())
-				.andExpect(view().name("tiles/member/member"));
+				.andExpect(view().name("jsonView"));
 	}
 	
 	@Test
-	public void registGetTest() throws Exception {
+	public void regist_Get_Test() throws Exception {
 		mockMvc.perform(get("/member/regist"))
 				.andExpect(status().isOk())
-				.andExpect(view().name("tiles/member/memberRegist"));
+				.andExpect(view().name("member/memberRegist"));
 	}
 	
 	
 	@Test
-	public void registPost_SUCCESS_Test() throws Exception {
+	public void regist_POST_SUCCESS_Test() throws Exception {
 		
 		InputStream is = getClass().getResourceAsStream("/kr/or/ddit/upload/brown.png");
 		MockMultipartFile file = new MockMultipartFile("file", "brown.png", "image/png", is);
@@ -64,11 +75,11 @@ public class MemberControllerTest extends WebTestConfig{
 						.param("addr2", "test")
 						.param("zipcode", "test"))
 				.andDo(print())
-				.andExpect(view().name("redirect:/member/list"));
+				.andExpect(status().is3xxRedirection());
 	}
 	
 	@Test
-	public void registPost_ERROR_Test() throws Exception {
+	public void regist_POST_ERROR_Test() throws Exception {
 		
 		InputStream is = getClass().getResourceAsStream("/kr/or/ddit/upload/brown.png");
 		MockMultipartFile file = new MockMultipartFile("file", "brown.png", "image/png", is);
@@ -81,11 +92,11 @@ public class MemberControllerTest extends WebTestConfig{
 						.param("addr1", "test")
 						.param("addr2", "test")
 						.param("zipcode", "test"))
-				.andExpect(view().name("tiles/member/memberRegist"));
+				.andExpect(view().name("member/memberRegist"));
 	}
 	
 	@Test
-	public void registPost_FAIL_Test() throws Exception {
+	public void regist_POST_FAIL_Test() throws Exception {
 		
 		InputStream is = getClass().getResourceAsStream("/kr/or/ddit/upload/brown.png");
 		MockMultipartFile file = new MockMultipartFile("file", "brown.png", "image/png", is);
@@ -99,25 +110,25 @@ public class MemberControllerTest extends WebTestConfig{
 				.param("addr1", "test")
 				.param("addr2", "test")
 				.param("zipcode", "test"))
-		.andExpect(view().name("tiles/member/memberRegist"));
+		.andExpect(view().name("member/memberRegist"));
 	}
 	
 	@Test
-	public void updateGetTest() throws Exception {
+	public void update_GET_Test() throws Exception {
 		mockMvc.perform(get("/member/update")
 						.param("userid", "brown"))
 				.andExpect(status().isOk())
-				.andExpect(view().name("tiles/member/memberUpdate"));
+				.andExpect(view().name("member/memberUpdate"));
 	}
 	
 	@Test
-	public void updatePost_SUCCESS_Test() throws Exception {
+	public void update_POST_SUCCESS_Test() throws Exception {
 		InputStream is = getClass().getResourceAsStream("/kr/or/ddit/upload/brown.png");
 		MockMultipartFile file = new MockMultipartFile("file", "brown.png", "image/png", is);
 		
 		mockMvc.perform(fileUpload("/member/update")
 						.file(file)
-						.param("userid", "test")
+						.param("userid", "brown")
 						.param("usernm", "updatetest")
 						.param("alias", "test")
 						.param("pass", "test")
@@ -126,6 +137,23 @@ public class MemberControllerTest extends WebTestConfig{
 						.param("zipcode", "test"))
 				.andExpect(status().is(302))
 				.andExpect(view().name("redirect:/member/member"));
+	}
+	
+	@Test
+	public void update_POST_ERROR_Test() throws Exception {
+		
+		InputStream is = getClass().getResourceAsStream("/kr/or/ddit/upload/brown.png");
+		MockMultipartFile file = new MockMultipartFile("file", "brown.png", "image/png", is);
+		
+		mockMvc.perform(fileUpload("/member/update")
+						.file(file)
+						.param("userid", "brown")
+						.param("alias", "test")
+						.param("pass", "test")
+						.param("addr1", "test")
+						.param("addr2", "test")
+						.param("zipcode", "test"))
+				.andExpect(view().name("member/memberUpdate"));
 	}
 	
 	@Test
@@ -146,52 +174,49 @@ public class MemberControllerTest extends WebTestConfig{
 		.andExpect(view().name("redirect:/member/update"));
 	}
 	
-	
-	
 	@Test
-	public void listAjaxPageTest() throws Exception {
-		mockMvc.perform(get("/member/listAjaxPage"))
-				.andExpect(status().isOk())
-				.andExpect(view().name("tiles/member/listAjaxPage"));
+	public void delete_SUCCESS_Test() throws Exception {
+		mockMvc.perform(get("/member/delete")
+					   .param("userid", "brown"))
+				.andExpect(status().is3xxRedirection())
+				.andExpect(view().name("redirect:/login/main"));
 	}
 	
 	@Test
-	public void listAjaxTest() throws Exception {
-		mockMvc.perform(get("/member/listAjax")
-						.param("page", "1")
-						.param("pageSize", "5"))
+	public void delete_FAIL_Test() throws Exception {
+		mockMvc.perform(get("/member/delete")
+				.param("userid", "test"))
+		.andExpect(status().is3xxRedirection());
+	}
+	
+	@Test
+	public void search_i_Test() throws Exception{
+		mockMvc.perform(get("/member/search")
+				   .param("searchType", "i")
+				   .param("searchKeyWord", "brown"))
+			.andExpect(status().isOk())
+			.andExpect(view().name("jsonView"));
+	}
+	
+	@Test
+	public void search_n_Test() throws Exception{
+		mockMvc.perform(get("/member/search")
+				.param("searchType", "n")
+				.param("searchKeyWord", "브라운"))
 		.andExpect(status().isOk())
-		.andExpect(model().attributeExists("memberList"))
-		.andExpect(model().attributeExists("pages"))
 		.andExpect(view().name("jsonView"));
 	}
 	
 	@Test
-	public void listAjaxHTMLTest() throws Exception {
-		mockMvc.perform(get("/member/listAjaxHTML")
-						.param("page", "1")
-						.param("pageSize", "5"))
+	public void search_a_Test() throws Exception{
+		mockMvc.perform(get("/member/search")
+				.param("searchType", "a")
+				.param("searchKeyWord", "브라운"))
 		.andExpect(status().isOk())
-		.andExpect(model().attributeExists("memberList"))
-		.andExpect(model().attributeExists("pages"))
-		.andExpect(view().name("member/listAjaxHTML"));
-	}
-	
-	@Test
-	public void getMemberAjaxPageTest() throws Exception {
-		mockMvc.perform(get("/member/memberAjaxPage"))
-		.andExpect(status().isOk())
-		.andExpect(view().name("tiles/member/memberAjaxPage"));
-	}
-	
-	@Test
-	public void getMemberAjaxTest() throws Exception {
-		mockMvc.perform(get("/member/memberAjax")
-						.param("userid", "brown"))
-		.andExpect(status().isOk())
-		.andExpect(model().attributeExists("memberVo"))
 		.andExpect(view().name("jsonView"));
 	}
+	
+	
 	
 
 }

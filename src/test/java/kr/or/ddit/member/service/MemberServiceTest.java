@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.junit.Test;
 
 import kr.or.ddit.ModelTestConfig;
@@ -27,7 +28,7 @@ public class MemberServiceTest extends ModelTestConfig{
 		List<MemberVo> memberList = memberService.selectAllMember();
 
 		/*** Then ***/
-		assertTrue(memberList.size() > 15);
+		assertEquals(15, memberList.size());
 	}
 	
 	@Test
@@ -42,18 +43,6 @@ public class MemberServiceTest extends ModelTestConfig{
 		assertEquals(1, insertCnt);
 	}
 
-	//@Test
-	public void insertMember_FAIL_Test() {
-		/***Given***/
-		MemberVo memberVo = new MemberVo("ddit", "dditpass", "대적인재", "개발원", "", "", "", "", "");
-		
-		/***When***/
-		int insertCnt = memberService.insertMember(memberVo);
-		
-		/***Then***/
-		assertEquals(1, insertCnt);
-	}
-	
 	@Test
 	public void getMemberTest() {
 
@@ -89,7 +78,7 @@ public class MemberServiceTest extends ModelTestConfig{
 
 		/*** Then ***/
 		assertEquals(pageVo.getPageSize(), memberList.size());
-		assertEquals(4, pages);
+		assertEquals(3, pages);
 
 	}
 	
@@ -130,6 +119,20 @@ public class MemberServiceTest extends ModelTestConfig{
 
 		/***Then***/
 		assertEquals(1, deleteCnt);
-		
+	}
+	
+	@Test
+	public void searchMemberTest() {
+		/***Given***/
+		Map<String, Object> map = new HashedMap<String, Object>();
+		map.put("page", 1);
+		map.put("pageSize", 5);
+		map.put("userid", "brown");
+
+		/***When***/
+		List<MemberVo> memberList = memberService.searchMember(map);
+
+		/***Then***/
+		assertEquals(1, memberList.size());
 	}
 }

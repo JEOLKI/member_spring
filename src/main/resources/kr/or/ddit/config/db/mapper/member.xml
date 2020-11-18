@@ -16,8 +16,7 @@
 		FROM users
 	</select>
 
-	<select id="selectMemberPageList" resultType="MemberVo"
-		parameterType="PageVo">
+	<select id="selectMemberPageList" resultType="MemberVo" parameterType="PageVo">
 		SELECT *
 		FROM (SELECT rownum rn, a.*
 		FROM ( SELECT *
@@ -52,5 +51,28 @@
 						 realFilename = #{realFilename}
 		WHERE userid = #{userid}
 	</update>
+
+	<select id="searchMember" resultType="MemberVo" parameterType="hashmap">
+	
+		SELECT *
+		FROM (SELECT rownum rn, a.*
+		FROM ( SELECT *
+				FROM users
+				WHERE 1=1
+				<if test="userid != null and userid != '' " >
+				AND userid = #{userid} 
+				</if>
+				<if test="usernm != null and usernm != '' " >
+				AND usernm = #{usernm}
+				</if>
+				<if test="alias != null and alias != '' " >
+				AND alias = #{alias}
+				</if>
+				order by userid) a)
+		WHERE rn between (#{page} - 1) * #{pageSize} + 1 and #{page} * #{pageSize}
+	
+	</select>
+
+
 
 </mapper>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import kr.or.ddit.member.model.MemberVo;
 import kr.or.ddit.member.service.MemberServiceI;
 
+@RequestMapping("/login")
 @Controller
 public class LoginController {
 
@@ -21,31 +22,31 @@ public class LoginController {
 	@Resource(name = "memberService")
 	private MemberServiceI memberService;
 
-	@RequestMapping(path = "/login", method = { RequestMethod.GET })
+	@RequestMapping(path = "/view", method = { RequestMethod.GET })
 	public String view() {
 		return "login/view";
 	}
 
-	@RequestMapping(path = "/login/process")
+	@RequestMapping(path = "/process", method = { RequestMethod.GET, RequestMethod.POST })
 	public String login(String userid, String pass, HttpSession session, Model model) {
-		
+
 		logger.debug("userId : {}, password : {} ", userid, pass);
 		MemberVo memberVo = memberService.getMember(userid);
-		
+
 		if (memberVo == null || !memberVo.getPass().equals(pass)) {
 			model.addAttribute("userid", userid);
 			return "login/view";
-		}else if (memberVo.getPass().equals(pass)) {
+		} else if (memberVo.getPass().equals(pass)) {
 			session.setAttribute("S_MEMBER", memberVo);
 			return "member/memberList";
 		}
 		return "login/view";
 	}
 
-	@RequestMapping("/logout")
-	public String logout(HttpSession session) {
-		session.invalidate();
-		return "login/view";
+	@RequestMapping(path = "/main")
+	public String main() {
+		return "member/memberList";
 	}
+
 
 }

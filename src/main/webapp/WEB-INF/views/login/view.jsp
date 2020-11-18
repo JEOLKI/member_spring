@@ -81,9 +81,14 @@ body.login-page {
 			$("form").submit();
 	
 		})
-	
+
+		//initData();
 	});
 
+	function initData(){
+		$('#userid').val("brown");
+		$('#pass').val("brownPass");
+	}
 
 </script>
 
@@ -98,14 +103,14 @@ body.login-page {
 			<div class="card-body login-card-body">
 				<p class="login-box-msg">Sign in to start your session</p>
 
-				<form action="${pageContext.request.contextPath }/login">
+				<form action="${pageContext.request.contextPath }/login/process" method="post">
 					<div class="form-group has-feedback">
-						<input type="text" class="form-control" name="userid"
+						<input type="text" class="form-control" id="userid" name="userid"
 							placeholder="아이디를 입력하세요." value="${userid }"> <span
 							class="glyphicon glyphicon-envelope form-control-feedback"></span>
 					</div>
 					<div class="form-group has-feedback">
-						<input type="password" class="form-control" name="pass"
+						<input type="password" class="form-control" id="pass" name="pass"
 							placeholder="패스워드를 입력하세요." value=""> <span
 							class="glyphicon glyphicon-lock form-control-feedback"></span>
 					</div>

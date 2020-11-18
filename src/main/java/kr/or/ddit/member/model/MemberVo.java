@@ -10,13 +10,14 @@ import org.hibernate.validator.constraints.NotEmpty;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-@JsonInclude(Include.NON_NULL)
+//@JsonInclude(Include.NON_NULL)
 @XmlRootElement(name="memberVo")
 public class MemberVo {
 
+	@NotEmpty
 	private String userid;
+	@NotEmpty
 	private String pass;
-	
 	// Null이면 안되고, empty 체크
 	@NotEmpty
 	private String usernm;
@@ -68,7 +69,7 @@ public class MemberVo {
 	}
 
 	public String getAddr1() {
-		return addr1;
+		return addr1 == null ? "" : addr1;
 	}
 
 	public void setAddr1(String addr1) {
@@ -76,7 +77,7 @@ public class MemberVo {
 	}
 
 	public String getAddr2() {
-		return addr2;
+		return addr2 == null ? "" : addr2;
 	}
 
 	public void setAddr2(String addr2) {

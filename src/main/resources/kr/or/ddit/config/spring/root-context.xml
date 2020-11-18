@@ -22,5 +22,15 @@
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
 	</context:component-scan>
 	
+	<!-- messageSource 등록 : bean id는 messageSource로 정해져있다.
+		 번들메세지_언어코드_국가코드.properties => 번들메세지 부분만 기입한다.
+	-->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:kr/or/ddit/config/message/error</value>
+			</list>
+		</property>
+	</bean>
 
 </beans>

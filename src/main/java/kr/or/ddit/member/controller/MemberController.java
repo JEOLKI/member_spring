@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import javax.validation.Valid;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -69,19 +71,16 @@ public class MemberController {
 	
 	@RequestMapping(path = "/regist" , method = {RequestMethod.GET})
 	public String regist() {
-		return "tiles/member/memberRegist";
+		return "member/memberRegist";
 	}
 	
 	
 	@RequestMapping(path = "/regist" , method = {RequestMethod.POST})
-	public String regist(@Valid MemberVo memberVo, BindingResult br, MultipartFile file) {
+	public String regist(@Valid MemberVo memberVo, BindingResult br,@RequestParam(required = false) MultipartFile file,
+						Model model) {
 		
-		// validation
-		//new MemberVoValidator().validate(memberVo, br);
-		
-		// 寃�利앹쓣 �넻怨쇳븯吏� 紐삵뻽�쑝誘�濡� �궗�슜�옄 �벑濡� �솕硫댁쑝濡� �씠�룞
 		if(br.hasErrors()) {
-			return "tiles/member/memberRegist";
+			return "member/memberRegist";
 		}
 		
 		String filePath = "";
@@ -99,7 +98,6 @@ public class MemberController {
 			}
 		}
 		
-		// �궗�슜�옄 �젙蹂� �벑濡�
 		memberVo.setFilename(filePath);
 		memberVo.setRealFilename(realFilename);
 		
@@ -107,28 +105,30 @@ public class MemberController {
 		try {
 			insertCnt = memberService.insertMember(memberVo);
 
-			// 1嫄댁씠 �엯�젰�릺�뿀�쓣 �븣 : �젙�긽 - memberList �럹�씠吏�濡� �씠�룞
 			if ( insertCnt == 1 ) {
-				return "redirect:/member/list";
+				return "redirect:/member/member?userid=" + memberVo.getUserid();
 			} 
 		} catch (Exception e) {
 		}
 		
-		// 1嫄댁씠 �븘�땺�븣 : 鍮꾩젙�긽
-		return "tiles/member/memberRegist";
+		model.addAttribute("msg", "fail");
+		
+		return "member/memberRegist";
 	}
 	
 	@RequestMapping(path = "/update", method = {RequestMethod.GET} )
 	public String update(Model model, String userid) {
-		
 		MemberVo memberVo = memberService.getMember(userid);
 		model.addAttribute("memberVo", memberVo);
-		
-		return "tiles/member/memberUpdate";
+		return "member/memberUpdate";
 	}
 	
 	@RequestMapping(path = "/update", method = {RequestMethod.POST})
-	public String update(MemberVo memberVo, MultipartFile file, RedirectAttributes ra ) {
+	public String update(@Valid MemberVo memberVo, BindingResult br,@RequestParam(required = false)MultipartFile file, RedirectAttributes ra ) {
+		
+		if(br.hasErrors()) {
+			return "member/memberUpdate";
+		}
 		
 		String realFilename= "";
 		String filePath ="";
@@ -162,17 +162,48 @@ public class MemberController {
 		
 		ra.addAttribute("userid", memberVo.getUserid());
 		
-		// �궗�슜�옄 �젙蹂� �벑濡�
 		int updateCnt = memberService.updateMember(memberVo);
 		
-		// 1嫄댁씠 �엯�젰�릺�뿀�쓣 �븣 : �젙�긽 - member �럹�씠吏�濡� �씠�룞
 		if ( updateCnt == 1 ) {
 			return "redirect:/member/member";
 		} 
-		// 1嫄댁씠 �븘�땺�븣 : 鍮꾩젙�긽
 		else {
 			return "redirect:/member/update";
 		}
+	}
+	
+	@RequestMapping("/delete")
+	public String delete(String userid) {
+		int deleteCnt = memberService.deleteMember(userid);
+		
+		if(deleteCnt == 1) {
+			return "redirect:/login/main";
+		} else {
+			return "redirect:/member/member?userid=" + userid;
+		}
+	}
+	
+	@RequestMapping("/search")
+	public String search(String searchType, String searchKeyWord, Model model,
+						@RequestParam(name="page", defaultValue = "1", required = false) int page,
+						@RequestParam(name="pageSize", defaultValue = "5", required = false ) int pageSize) {
+		
+		Map<String, Object> map = new HashedMap<String, Object>();
+		map.put("page", page);
+		map.put("pageSize", pageSize);
+		
+		if (searchType.equals("i")) {
+			map.put("userid", searchKeyWord);
+		} else if (searchType.equals("n")) {
+			map.put("usernm", searchKeyWord);
+		} else if (searchType.equals("a")) {
+			map.put("alias", searchKeyWord);
+		}
+		
+		List<MemberVo> memberList = memberService.searchMember(map);
+		model.addAttribute("memberList", memberList);
+		
+		return "jsonView";
 	}
 	
 	

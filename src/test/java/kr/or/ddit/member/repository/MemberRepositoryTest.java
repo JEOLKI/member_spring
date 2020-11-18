@@ -4,9 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.junit.Test;
 import org.mybatis.spring.SqlSessionTemplate;
 
@@ -30,7 +32,7 @@ public class MemberRepositoryTest extends ModelTestConfig {
 		List<MemberVo> memberList = memberRepository.selectAllMember();
 
 		/*** Then ***/
-		assertTrue(memberList.size() > 15);
+		assertEquals(15, memberList.size());
 	}
 
 	@Test
@@ -75,7 +77,7 @@ public class MemberRepositoryTest extends ModelTestConfig {
 		int totalCnt = memberRepository.selectMemberTotalCnt();
 
 		/*** Then ***/
-		assertEquals(16, totalCnt);
+		assertEquals(15, totalCnt);
 
 	}
 
@@ -118,5 +120,21 @@ public class MemberRepositoryTest extends ModelTestConfig {
 		assertEquals(1, deleteCnt);
 		
 	}
+	
+	@Test
+	public void searchMemberTest() {
+		/***Given***/
+		Map<String, Object> map = new HashedMap<String, Object>();
+		map.put("page", 1);
+		map.put("pageSize", 5);
+		map.put("userid", "brown");
+
+		/***When***/
+		List<MemberVo> memberList = memberRepository.searchMember(map);
+
+		/***Then***/
+		assertEquals(1, memberList.size());
+	}
+	
 
 }
